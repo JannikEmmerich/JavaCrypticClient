@@ -15,3 +15,7 @@ jobs:
           java-version: 1.8
       - name: Build with Maven
         run: mvn clean validate compile
+      - name: Deploy with maven
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: mvn deploy -Dregistry=https://maven.pkg.github.com/JannikEmmerich -Dtoken=$GH_TOKEN
