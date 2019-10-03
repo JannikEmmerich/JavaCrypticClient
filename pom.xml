@@ -49,4 +49,15 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <url>https://maven.pkg.github.com/JannikEmmerich</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>https://maven.pkg.github.com/JannikEmmerich</url>
+        </snapshotRepository>
+    </distributionManagement>
+
 </project>
