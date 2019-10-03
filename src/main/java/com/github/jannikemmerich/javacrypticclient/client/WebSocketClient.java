@@ -1,6 +1,6 @@
 package com.github.jannikemmerich.javacrypticclient.client;
 
-import com.github.jannikemmerich.javacrypticclient.Terminal;
+import com.github.jannikemmerich.javacrypticclient.terminal.Terminal;
 import com.github.jannikemmerich.javacrypticclient.util.JSONBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
