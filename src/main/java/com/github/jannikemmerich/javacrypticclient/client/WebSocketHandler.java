@@ -5,6 +5,10 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker;
 import io.netty.handler.codec.http.websocketx.WebSocketHandshakeException;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.util.UUID;
 
 public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
 
@@ -51,6 +55,21 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
         }
 
         TextWebSocketFrame frame = (TextWebSocketFrame) msg;
-        System.out.println(frame.text());
+
+        JSONObject json = (JSONObject) new JSONParser().parse(frame.text());
+
+        if(!json.containsKey("tag")) {
+            System.out.println(json.toJSONString());
+            return;
+        }
+
+        UUID tag = UUID.fromString((String) json.get("tag"));
+
+        if(Request.requests.containsKey(tag)) {
+            Request.requests.remove(tag);
+            Request.requests.put(tag, (JSONObject) json.get("data"));
+        } else {
+            System.out.println(json.toJSONString());
+        }
     }
 }

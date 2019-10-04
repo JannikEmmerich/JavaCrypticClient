@@ -26,10 +26,14 @@ import java.net.URI;
 
 public class WebSocketClient {
 
+    private static WebSocketClient instance;
+
     private static final boolean EPOLL = Epoll.isAvailable();
     private Channel channel;
 
     public WebSocketClient(String username, String password, URI uri) throws Exception {
+
+        instance = this;
 
         String scheme = uri.getScheme() == null ? "wss" : uri.getScheme();
         String host = uri.getHost() == null ? "ws.cryptic-game.net" : uri.getHost();
@@ -84,5 +88,13 @@ public class WebSocketClient {
     private void login(String username, String password) {
         JSONObject login = JSONBuilder.newJSONObject().add("action", "login").add("name", username).add("password", password).build();
         channel.writeAndFlush(new TextWebSocketFrame(login.toJSONString()));
+    }
+
+    public static WebSocketClient getInstance() {
+        return instance;
+    }
+
+    public Channel getChannel() {
+        return channel;
     }
 }

@@ -1,10 +1,7 @@
 package com.github.jannikemmerich.javacrypticclient.terminal;
 
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.StatusCommand;
-import com.github.jannikemmerich.javacrypticclient.util.JSONBuilder;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.*;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,9 +24,20 @@ public class Terminal {
                 break;
             }
 
-            if("info".equalsIgnoreCase(msg)) {
-                channel.writeAndFlush(new TextWebSocketFrame(JSONBuilder.newJSONObject().add("action", "info").build().toJSONString()));
+            String[] split = msg.split(" ");
+            String command = split[0];
+            String[] args = new String[split.length - 1];
+
+            for(int i = 1; i < split.length; i++) {
+                args[i-1] = split[i];
             }
+
+            if(!commands.containsKey(command)) {
+                System.out.println("Command does not exist");
+                continue;
+            }
+
+            System.out.println(commands.get(command).executeCommand(args));
         }
     }
 
@@ -37,5 +45,6 @@ public class Terminal {
         commands = new HashMap<>();
 
         commands.put("status", new StatusCommand());
+        commands.put("devices", new DevicesCommand());
     }
 }
