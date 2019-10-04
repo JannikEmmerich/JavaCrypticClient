@@ -22,7 +22,7 @@
     </dependencies>
 
     <build>
-        <finalName>javacrypticclient</finalName>
+        <finalName>JavaCrypticClient</finalName>
         <plugins>
 
             <plugin>
