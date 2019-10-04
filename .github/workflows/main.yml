@@ -15,3 +15,10 @@ jobs:
           java-version: 1.8
       - name: Build with Maven
         run: mvn clean validate compile
+      - name: trigger single Job
+        uses: appleboy/jenkins-action@master
+        with:
+          url: "https://jenkins.rubidium.ml"
+          user: "jannik"
+          token: ${{ secrets.TOKEN }}
+          job: "JavaCrypticClient"
