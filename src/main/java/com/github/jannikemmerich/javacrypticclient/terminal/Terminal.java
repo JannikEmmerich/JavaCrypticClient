@@ -1,6 +1,9 @@
 package com.github.jannikemmerich.javacrypticclient.terminal;
 
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.*;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.DevicesCommand;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.ExitCommand;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.StatusCommand;
 import io.netty.channel.Channel;
 
 import java.io.BufferedReader;
@@ -46,5 +49,6 @@ public class Terminal {
 
         commands.put("status", new StatusCommand());
         commands.put("devices", new DevicesCommand());
+        commands.put("exit", new ExitCommand());
     }
 }

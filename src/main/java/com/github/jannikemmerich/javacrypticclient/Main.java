@@ -30,5 +30,4 @@ public class Main {
     Main(String username, String password, URI uri) throws Exception {
         new WebSocketClient(username, password, uri);
     }
-
 }

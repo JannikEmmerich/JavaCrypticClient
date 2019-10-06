@@ -1,5 +1,7 @@
 package com.github.jannikemmerich.javacrypticclient.client;
 
+import club.minnced.discord.rpc.DiscordRPC;
+import club.minnced.discord.rpc.DiscordRichPresence;
 import com.github.jannikemmerich.javacrypticclient.terminal.Terminal;
 import com.github.jannikemmerich.javacrypticclient.util.JSONBuilder;
 import io.netty.bootstrap.Bootstrap;
@@ -79,10 +81,27 @@ public class WebSocketClient {
             handler.handshakeFuture().sync();
 
             login(username, password);
+
+            setupDiscordPresence(host, username);
+
             new Terminal(channel);
         } finally {
+            DiscordRPC.INSTANCE.Discord_ClearPresence();
             eventLoopGroup.shutdownGracefully();
         }
+    }
+
+    private void setupDiscordPresence(String host, String username) {
+        DiscordRPC lib = DiscordRPC.INSTANCE;
+        String appID = "596676243144048640";
+        lib.Discord_Initialize(appID, null, true, null);
+        DiscordRichPresence presence = new DiscordRichPresence();
+        presence.startTimestamp = System.currentTimeMillis() / 1000;
+        presence.state = "Logged in: " + username + "@" + host;
+        presence.details = "JavaCrypticClient";
+        presence.largeImageKey = "cryptic";
+        presence.largeImageText = "Cryptic";
+        lib.Discord_UpdatePresence(presence);
     }
 
     private void login(String username, String password) {
