@@ -84,7 +84,7 @@ public class WebSocketClient {
 
             setupDiscordPresence(host, username);
 
-            new Terminal(channel);
+            new Terminal(channel, username);
         } finally {
             DiscordRPC.INSTANCE.Discord_ClearPresence();
             eventLoopGroup.shutdownGracefully();

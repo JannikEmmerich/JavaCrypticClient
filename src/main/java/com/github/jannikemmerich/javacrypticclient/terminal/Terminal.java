@@ -1,27 +1,37 @@
 package com.github.jannikemmerich.javacrypticclient.terminal;
 
+import com.github.jannikemmerich.javacrypticclient.client.Request;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.DevicesCommand;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.ExitCommand;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.StatusCommand;
 import io.netty.channel.Channel;
+import org.json.simple.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class Terminal {
 
     private HashMap<String, Command> commands;
 
-    public Terminal(Channel channel) throws IOException {
+    public Terminal(Channel channel, String username) throws IOException {
 
         addCommands();
+
+        JSONObject devicesRequest = Request.create("device", Arrays.asList("device", "all"), new JSONObject()).waitForAnswer();
+        List<JSONObject> devices = (List<JSONObject>) devicesRequest.get("devices");
+
+        JSONObject currentDevice = devices.get(0);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         while(true) {
+            System.out.print(username + "@" + currentDevice.get("name") + " $ ");
+
             String msg = reader.readLine();
             if(msg == null) {
                 break;
@@ -36,7 +46,7 @@ public class Terminal {
             }
 
             if(!commands.containsKey(command)) {
-                System.out.println("Command does not exist");
+                System.out.println("Command could not be found.\nType `help` for a list of commands.");
                 continue;
             }
 
@@ -48,7 +58,6 @@ public class Terminal {
         commands = new HashMap<>();
 
         commands.put("status", new StatusCommand());
-        commands.put("devices", new DevicesCommand());
         commands.put("exit", new ExitCommand());
     }
 }
