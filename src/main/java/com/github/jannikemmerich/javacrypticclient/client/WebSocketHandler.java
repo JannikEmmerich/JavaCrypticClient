@@ -45,7 +45,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
         if(!handshaker.isHandshakeComplete()) {
             try {
                 handshaker.finishHandshake(channel, (FullHttpResponse) msg);
-                System.out.println("WebSocket connected");
                 handshakeFuture.setSuccess();
             } catch (WebSocketHandshakeException e) {
                 System.out.println("WebSocket failed to connect");
@@ -53,13 +52,22 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
             }
             return;
         }
-
         TextWebSocketFrame frame = (TextWebSocketFrame) msg;
 
         JSONObject json = (JSONObject) new JSONParser().parse(frame.text());
 
         if(!json.containsKey("tag")) {
-            System.out.println(json.toJSONString());
+            if(json.get("token") != null) {
+                WebSocketClient.getInstance().status = "success";
+            } else if (json.get("error") != null) {
+                if(json.get("error").equals("permissions denied")) {
+                    WebSocketClient.getInstance().status = "failed";
+                }
+            } else if (json.get("online") != null) {
+                WebSocketClient.getInstance().unhandledPackets.put("info", json);
+            }
+
+
             return;
         }
 
@@ -68,8 +76,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
         if(Request.requests.containsKey(tag)) {
             Request.requests.remove(tag);
             Request.requests.put(tag, (JSONObject) json.get("data"));
-        } else {
-            System.out.println(json.toJSONString());
         }
     }
 }

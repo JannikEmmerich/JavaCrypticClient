@@ -1,5 +1,6 @@
 package com.github.jannikemmerich.javacrypticclient.terminal;
 
+import com.github.jannikemmerich.javacrypticclient.models.DeviceModel;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.ExitCommand;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.HelpCommand;
@@ -22,6 +23,9 @@ public class Terminal {
     private String prefix;
 
     private boolean waitForCommand = true;
+
+    private String username;
+    private DeviceModel activeDevice;
 
     public Terminal() {
         instance = this;
@@ -87,6 +91,7 @@ public class Terminal {
     private void addCommands() {
         commands = new HashMap<>();
 
+        commands.put("help", new HelpCommand());
         commands.put("status", new StatusCommand());
         commands.put("exit", new ExitCommand());
     }
@@ -100,5 +105,26 @@ public class Terminal {
         catch (UnknownHostException ignored) {}
 
         return username + "@" + hostname + " $ ";
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public DeviceModel getActiveDevice() {
+        return activeDevice;
+    }
+
+    public void setActiveDevice(DeviceModel activeDevice) {
+        this.activeDevice = activeDevice;
+    }
+
+    public void postLogin(String username) {
+        addCommands();
+
+        this.username = username;
+        activeDevice = DeviceModel.getFirstDevice();
+
+        prefix = username + "@" + activeDevice.getHostname() + " $ ";
     }
 }

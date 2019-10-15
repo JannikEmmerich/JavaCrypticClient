@@ -1,9 +1,5 @@
 package com.github.jannikemmerich.javacrypticclient.client;
 
-import club.minnced.discord.rpc.DiscordRPC;
-import club.minnced.discord.rpc.DiscordRichPresence;
-import com.github.jannikemmerich.javacrypticclient.terminal.Terminal;
-import com.github.jannikemmerich.javacrypticclient.util.JSONBuilder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
@@ -17,7 +13,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -25,6 +20,8 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.json.simple.JSONObject;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WebSocketClient {
 
@@ -33,9 +30,14 @@ public class WebSocketClient {
     private static final boolean EPOLL = Epoll.isAvailable();
     private Channel channel;
 
-    public WebSocketClient(String username, String password, URI uri) throws Exception {
+    public String status = "waiting";
 
+    public Map<String, JSONObject> unhandledPackets = new HashMap<>();
+
+    public WebSocketClient(String url) throws Exception {
         instance = this;
+
+        URI uri = URI.create(url);
 
         String scheme = uri.getScheme() == null ? "wss" : uri.getScheme();
         String host = uri.getHost() == null ? "ws.cryptic-game.net" : uri.getHost();
@@ -63,8 +65,6 @@ public class WebSocketClient {
 
         WebSocketHandler handler = new WebSocketHandler(WebSocketClientHandshakerFactory
                 .newHandshaker(uri, WebSocketVersion.V13, null, false, new DefaultHttpHeaders()));
-
-        try {
             channel = new Bootstrap()
                     .group(eventLoopGroup)
                     .channel(EPOLL ? EpollSocketChannel.class : NioSocketChannel.class)
@@ -79,32 +79,6 @@ public class WebSocketClient {
                         }
                     }).connect(host, port).sync().channel();
             handler.handshakeFuture().sync();
-
-            login(username, password);
-
-            setupDiscordPresence(host, username);
-        } finally {
-            DiscordRPC.INSTANCE.Discord_ClearPresence();
-            eventLoopGroup.shutdownGracefully();
-        }
-    }
-
-    private void setupDiscordPresence(String host, String username) {
-        DiscordRPC lib = DiscordRPC.INSTANCE;
-        String appID = "596676243144048640";
-        lib.Discord_Initialize(appID, null, true, null);
-        DiscordRichPresence presence = new DiscordRichPresence();
-        presence.startTimestamp = System.currentTimeMillis() / 1000;
-        presence.state = "Logged in: " + username + "@" + host;
-        presence.details = "JavaCrypticClient";
-        presence.largeImageKey = "cryptic";
-        presence.largeImageText = "Cryptic";
-        lib.Discord_UpdatePresence(presence);
-    }
-
-    private void login(String username, String password) {
-        JSONObject login = JSONBuilder.newJSONObject().add("action", "login").add("name", username).add("password", password).build();
-        channel.writeAndFlush(new TextWebSocketFrame(login.toJSONString()));
     }
 
     public static WebSocketClient getInstance() {
