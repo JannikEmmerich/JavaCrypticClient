@@ -16,6 +16,6 @@ public class ExitCommand implements Command {
 
     @Override
     public String getHelpMessage() {
-        return "Terminate the program";
+        return "Terminates the program";
     }
 }

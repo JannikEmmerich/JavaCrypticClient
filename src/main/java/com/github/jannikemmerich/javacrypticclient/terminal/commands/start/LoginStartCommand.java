@@ -1,5 +1,7 @@
 package com.github.jannikemmerich.javacrypticclient.terminal.commands.start;
 
+import club.minnced.discord.rpc.DiscordRPC;
+import club.minnced.discord.rpc.DiscordRichPresence;
 import com.github.jannikemmerich.javacrypticclient.Main;
 import com.github.jannikemmerich.javacrypticclient.client.WebSocketClient;
 import com.github.jannikemmerich.javacrypticclient.terminal.Terminal;
@@ -59,6 +61,7 @@ public class LoginStartCommand implements Command {
         }
 
         if(WebSocketClient.getInstance().status.equals("success")) {
+            setupDiscordRichPresence(username);
             return true;
         }
 
@@ -90,5 +93,15 @@ public class LoginStartCommand implements Command {
     @Override
     public String getHelpMessage() {
         return "Log in to a Cryptic server";
+    }
+
+    private void setupDiscordRichPresence(String username) {
+        DiscordRichPresence presence = new DiscordRichPresence();
+        presence.startTimestamp = System.currentTimeMillis() / 1000;
+        presence.state = "Logged in: " + username + "@cryptic-game.net";
+        presence.details = "JavaCrypticClient";
+        presence.largeImageKey = "cryptic";
+        presence.largeImageText = "Cryptic";
+        DiscordRPC.INSTANCE.Discord_UpdatePresence(presence);
     }
 }

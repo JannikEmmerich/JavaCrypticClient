@@ -5,7 +5,6 @@ import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.ExitCommand;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.HelpCommand;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.StatusCommand;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.start.ExitStartCommand;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.start.LoginStartCommand;
 
 import java.io.BufferedReader;
@@ -82,7 +81,7 @@ public class Terminal {
     private void addStartCommands() {
       commands = new HashMap<>();
 
-      commands.put("exit", new ExitStartCommand());
+      commands.put("exit", new ExitCommand());
       commands.put("login", new LoginStartCommand());
       commands.put("help", new HelpCommand());
 
