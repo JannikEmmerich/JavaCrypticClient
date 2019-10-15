@@ -1,38 +1,51 @@
 package com.github.jannikemmerich.javacrypticclient.terminal;
 
-import com.github.jannikemmerich.javacrypticclient.client.Request;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.ExitCommand;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.HelpCommand;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.StatusCommand;
-import io.netty.channel.Channel;
-import org.json.simple.JSONObject;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.start.ExitStartCommand;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.start.LoginStartCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.List;
 
 public class Terminal {
 
+    private static Terminal instance;
+
     private HashMap<String, Command> commands;
+    private String prefix;
 
-    public Terminal(Channel channel, String username) throws IOException {
+    private boolean waitForCommand = true;
 
-        addCommands();
+    public Terminal() {
+        instance = this;
 
-        JSONObject devicesRequest = Request.create("device", Arrays.asList("device", "all"), new JSONObject()).waitForAnswer();
-        List<JSONObject> devices = (List<JSONObject>) devicesRequest.get("devices");
+        addStartCommands();
 
-        JSONObject currentDevice = devices.get(0);
+        prefix = getStartPrefix();
 
+        initializeTerminal();
+    }
+
+    private void initializeTerminal() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        while(true) {
-            System.out.print(username + "@" + currentDevice.get("name") + " $ ");
+        while (waitForCommand) {
+            System.out.print(prefix);
 
-            String msg = reader.readLine();
+            String msg = null;
+            try {
+                msg = reader.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             if(msg == null) {
                 break;
             }
@@ -54,10 +67,38 @@ public class Terminal {
         }
     }
 
+    public static Terminal getInstance() {
+        return instance;
+    }
+
+    public HashMap<String, Command> getCommands() {
+        return commands;
+    }
+
+    private void addStartCommands() {
+      commands = new HashMap<>();
+
+      commands.put("exit", new ExitStartCommand());
+      commands.put("login", new LoginStartCommand());
+      commands.put("help", new HelpCommand());
+
+    }
+
     private void addCommands() {
         commands = new HashMap<>();
 
         commands.put("status", new StatusCommand());
         commands.put("exit", new ExitCommand());
+    }
+
+    private String getStartPrefix() {
+        String username = System.getProperty("user.name");
+        String hostname = "localhost";
+        try {
+            hostname = InetAddress.getLocalHost().getHostName();
+        }
+        catch (UnknownHostException ignored) {}
+
+        return username + "@" + hostname + " $ ";
     }
 }

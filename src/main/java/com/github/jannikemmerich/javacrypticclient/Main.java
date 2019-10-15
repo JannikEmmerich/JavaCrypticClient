@@ -1,6 +1,7 @@
 package com.github.jannikemmerich.javacrypticclient;
 
 import com.github.jannikemmerich.javacrypticclient.client.WebSocketClient;
+import com.github.jannikemmerich.javacrypticclient.terminal.Terminal;
 
 import java.net.URI;
 import java.util.Scanner;
@@ -10,7 +11,7 @@ public class Main {
     private static final String URL = System.getProperty("url", "wss://ws.test.cryptic-game.net:443/");
 
     public static void main(String[] args) throws Exception {
-        Scanner scanner = new Scanner(System.in);
+        /*Scanner scanner = new Scanner(System.in);
 
         System.out.print("Please enter your username: ");
         String username = scanner.nextLine();
@@ -24,7 +25,9 @@ public class Main {
         }
 
         URI uri = new URI(URL);
-        new Main(username, password, uri);
+        new Main(username, password, uri);*/
+
+        new Terminal();
     }
 
     Main(String username, String password, URI uri) throws Exception {
