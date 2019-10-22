@@ -1,11 +1,8 @@
 package com.github.jannikemmerich.javacrypticclient.terminal;
 
-import com.github.jannikemmerich.javacrypticclient.models.DeviceModel;
+import com.github.jannikemmerich.javacrypticclient.client.Client;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.ExitCommand;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.HelpCommand;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.StatusCommand;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.start.LoginStartCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,28 +15,21 @@ public class Terminal {
 
     private static Terminal instance;
 
-    private HashMap<String, Command> commands;
+    private Client client;
     private String prefix;
+    private HashMap<String, Command> commands;
 
-    private boolean waitForCommand = true;
-
-    private String username;
-    private DeviceModel activeDevice;
-
-    public Terminal() {
+    public Terminal(String url) {
         instance = this;
 
-        addStartCommands();
-
         prefix = getStartPrefix();
+        addCommands();
 
-        initializeTerminal();
-    }
+        client = new Client(url);
 
-    private void initializeTerminal() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        while (waitForCommand) {
+        while (true) {
             System.out.print(prefix);
 
             String msg = null;
@@ -66,7 +56,7 @@ public class Terminal {
                 continue;
             }
 
-            System.out.println(commands.get(command).executeCommand(args));
+            commands.get(command).execute(args);
         }
     }
 
@@ -74,25 +64,13 @@ public class Terminal {
         return instance;
     }
 
-    public HashMap<String, Command> getCommands() {
-        return commands;
-    }
-
-    private void addStartCommands() {
-      commands = new HashMap<>();
-
-      commands.put("exit", new ExitCommand());
-      commands.put("login", new LoginStartCommand());
-      commands.put("help", new HelpCommand());
-
+    public Client getClient() {
+        return client;
     }
 
     private void addCommands() {
         commands = new HashMap<>();
-
         commands.put("help", new HelpCommand());
-        commands.put("status", new StatusCommand());
-        commands.put("exit", new ExitCommand());
     }
 
     private String getStartPrefix() {
@@ -106,24 +84,7 @@ public class Terminal {
         return username + "@" + hostname + " $ ";
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public DeviceModel getActiveDevice() {
-        return activeDevice;
-    }
-
-    public void setActiveDevice(DeviceModel activeDevice) {
-        this.activeDevice = activeDevice;
-    }
-
-    public void postLogin(String username) {
-        addCommands();
-
-        this.username = username;
-        activeDevice = DeviceModel.getFirstDevice();
-
-        prefix = username + "@" + activeDevice.getHostname() + " $ ";
+    public HashMap<String, Command> getCommands() {
+        return commands;
     }
 }

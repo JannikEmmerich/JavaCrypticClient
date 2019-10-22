@@ -8,8 +8,6 @@ import io.netty.handler.codec.http.websocketx.WebSocketHandshakeException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.util.UUID;
-
 public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
 
     private WebSocketClientHandshaker handshaker;
@@ -56,26 +54,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
 
         JSONObject json = (JSONObject) new JSONParser().parse(frame.text());
 
-        if(!json.containsKey("tag")) {
-            if(json.get("token") != null) {
-                WebSocketClient.getInstance().status = "success";
-            } else if (json.get("error") != null) {
-                if(json.get("error").equals("permissions denied")) {
-                    WebSocketClient.getInstance().status = "failed";
-                }
-            } else if (json.get("online") != null) {
-                WebSocketClient.getInstance().unhandledPackets.put("info", json);
-            }
 
-
-            return;
-        }
-
-        UUID tag = UUID.fromString((String) json.get("tag"));
-
-        if(Request.requests.containsKey(tag)) {
-            Request.requests.remove(tag);
-            Request.requests.put(tag, (JSONObject) json.get("data"));
-        }
     }
 }

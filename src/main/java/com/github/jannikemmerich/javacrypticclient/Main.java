@@ -6,11 +6,32 @@ import com.github.jannikemmerich.javacrypticclient.terminal.Terminal;
 
 public class Main {
 
-    public static final String URL = System.getProperty("url", "wss://ws.cryptic-game.net:443/");
+    private static final String URL_PROD = System.getProperty("url", "wss://ws.cryptic-game.net:443/");
+    private static final String URL_TEST = System.getProperty("url", "wss://ws.test.cryptic-game.net:443/");
 
     public static void main(String[] args) throws Exception {
+
+        if(args.length != 1) {
+            System.out.println("Available arguments: prod / test / <websocket url>");
+            System.exit(-1);
+        }
+
         setupDiscordPresence();
-        new Terminal();
+
+        String url;
+
+        switch (args[0]) {
+            case "prod":
+                url = URL_PROD;
+                break;
+            case "test":
+                url = URL_TEST;
+                break;
+            default:
+                url = args[0];
+        }
+
+        new Terminal(url);
     }
 
     private static void setupDiscordPresence() {

@@ -5,18 +5,18 @@ import com.github.jannikemmerich.javacrypticclient.terminal.Terminal;
 public class HelpCommand implements Command {
 
     @Override
-    public String executeCommand(String[] args) {
+    public void execute(String[] args) {
         StringBuilder helpMessage = new StringBuilder();
 
         for(String commands : Terminal.getInstance().getCommands().keySet()) {
-            helpMessage.append(commands).append("\t\t").append(Terminal.getInstance().getCommands().get(commands).getHelpMessage()).append("\n");
+            helpMessage.append(commands).append("\t\t").append(Terminal.getInstance().getCommands().get(commands).getHelp()).append("\n");
         }
 
-        return helpMessage.toString();
+        System.out.println(helpMessage.toString());
     }
 
     @Override
-    public String getHelpMessage() {
+    public String getHelp() {
         return "Prints all available commands";
     }
 }

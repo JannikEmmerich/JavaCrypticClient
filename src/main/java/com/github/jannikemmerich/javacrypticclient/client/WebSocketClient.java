@@ -17,30 +17,24 @@ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import org.json.simple.JSONObject;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 public class WebSocketClient {
-
-    private static WebSocketClient instance;
 
     private static final boolean EPOLL = Epoll.isAvailable();
     private Channel channel;
 
-    public String status = "waiting";
-
-    public Map<String, JSONObject> unhandledPackets = new HashMap<>();
-
-    public WebSocketClient(String url) throws Exception {
-        instance = this;
-
+    public WebSocketClient(String url) {
         URI uri = URI.create(url);
 
-        String scheme = uri.getScheme() == null ? "wss" : uri.getScheme();
-        String host = uri.getHost() == null ? "ws.cryptic-game.net" : uri.getHost();
+        if(uri.getScheme() == null || uri.getHost() == null) {
+            System.out.println("Please use the following structure: ws(s)://<host>:<port>");
+            System.exit(-1);
+        }
+
+        String scheme = uri.getScheme();
+        String host = uri.getHost();
         int port;
         if(uri.getPort() == -1) {
             if ("ws".equalsIgnoreCase(scheme)) {
@@ -65,6 +59,7 @@ public class WebSocketClient {
 
         WebSocketHandler handler = new WebSocketHandler(WebSocketClientHandshakerFactory
                 .newHandshaker(uri, WebSocketVersion.V13, null, false, new DefaultHttpHeaders()));
+        try {
             channel = new Bootstrap()
                     .group(eventLoopGroup)
                     .channel(EPOLL ? EpollSocketChannel.class : NioSocketChannel.class)
@@ -79,10 +74,9 @@ public class WebSocketClient {
                         }
                     }).connect(host, port).sync().channel();
             handler.handshakeFuture().sync();
-    }
-
-    public static WebSocketClient getInstance() {
-        return instance;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public Channel getChannel() {

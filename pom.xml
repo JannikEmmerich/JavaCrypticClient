@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.github.MinnDevelopment</groupId>
             <artifactId>java-discord-rpc</artifactId>
-            <version>v2.0.1</version>
+            <version>v2.0.2</version>
         </dependency>
     </dependencies>
 
