@@ -3,6 +3,7 @@ package com.github.jannikemmerich.javacrypticclient.terminal;
 import com.github.jannikemmerich.javacrypticclient.client.Client;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.HelpCommand;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.LoginCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -47,9 +48,7 @@ public class Terminal {
             String command = split[0];
             String[] args = new String[split.length - 1];
 
-            for(int i = 1; i < split.length; i++) {
-                args[i-1] = split[i];
-            }
+            System.arraycopy(split, 1, args, 0, split.length - 1);
 
             if(!commands.containsKey(command)) {
                 System.out.println("Command could not be found.\nType `help` for a list of commands.");
@@ -71,6 +70,7 @@ public class Terminal {
     private void addCommands() {
         commands = new HashMap<>();
         commands.put("help", new HelpCommand());
+        commands.put("login", new LoginCommand());
     }
 
     private String getStartPrefix() {

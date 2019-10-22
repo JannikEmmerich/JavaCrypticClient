@@ -9,8 +9,7 @@ public class Main {
     private static final String URL_PROD = System.getProperty("url", "wss://ws.cryptic-game.net:443/");
     private static final String URL_TEST = System.getProperty("url", "wss://ws.test.cryptic-game.net:443/");
 
-    public static void main(String[] args) throws Exception {
-
+    public static void main(String[] args) {
         if(args.length != 1) {
             System.out.println("Available arguments: prod / test / <websocket url>");
             System.exit(-1);

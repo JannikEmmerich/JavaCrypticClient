@@ -1,5 +1,6 @@
 package com.github.jannikemmerich.javacrypticclient.client;
 
+import com.github.jannikemmerich.javacrypticclient.terminal.Terminal;
 import io.netty.channel.*;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
@@ -33,6 +34,7 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Terminal.getInstance().getClient().setConnected(false);
         System.out.println("WebSocket disconnected");
     }
 
@@ -54,6 +56,6 @@ public class WebSocketHandler extends SimpleChannelInboundHandler<Object> {
 
         JSONObject json = (JSONObject) new JSONParser().parse(frame.text());
 
-
+        if(Request.activeRequest != null) Request.activeRequest.handle(json);
     }
 }
