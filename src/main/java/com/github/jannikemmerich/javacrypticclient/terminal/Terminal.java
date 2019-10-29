@@ -1,10 +1,7 @@
 package com.github.jannikemmerich.javacrypticclient.terminal;
 
 import com.github.jannikemmerich.javacrypticclient.client.Client;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.HelpCommand;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.LoginCommand;
-import com.github.jannikemmerich.javacrypticclient.terminal.commands.RegisterCommand;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,7 +21,7 @@ public class Terminal {
     public Terminal(String url) {
         instance = this;
 
-        prefix = getStartPrefix();
+        startPrefix();
         addCommands();
 
         client = new Client(url);
@@ -73,9 +70,10 @@ public class Terminal {
         commands.put("help", new HelpCommand());
         commands.put("login", new LoginCommand());
         commands.put("register", new RegisterCommand());
+        commands.put("logout", new LogoutCommand());
     }
 
-    private String getStartPrefix() {
+    public void startPrefix() {
         String username = System.getProperty("user.name");
         String hostname = "localhost";
         try {
@@ -83,7 +81,7 @@ public class Terminal {
         }
         catch (UnknownHostException ignored) {}
 
-        return username + "@" + hostname + " $ ";
+        prefix = username + "@" + hostname + " $ ";
     }
 
     public void loggedIn(String username) {
