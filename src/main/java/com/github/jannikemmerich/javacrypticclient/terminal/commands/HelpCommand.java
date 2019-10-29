@@ -9,7 +9,7 @@ public class HelpCommand implements Command {
         StringBuilder helpMessage = new StringBuilder();
 
         for(String commands : Terminal.getInstance().getCommands().keySet()) {
-            helpMessage.append(commands).append("\t\t").append(Terminal.getInstance().getCommands().get(commands).getHelp()).append("\n");
+            helpMessage.append(commands).append(Terminal.getInstance().getCommands().get(commands).getHelp()).append("\n");
         }
 
         System.out.println(helpMessage.toString());
@@ -17,6 +17,6 @@ public class HelpCommand implements Command {
 
     @Override
     public String getHelp() {
-        return "Prints all available commands";
+        return "\t\tPrints all available commands";
     }
 }

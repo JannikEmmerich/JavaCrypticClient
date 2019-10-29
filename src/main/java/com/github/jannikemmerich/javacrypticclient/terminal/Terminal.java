@@ -4,6 +4,7 @@ import com.github.jannikemmerich.javacrypticclient.client.Client;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.Command;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.HelpCommand;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.LoginCommand;
+import com.github.jannikemmerich.javacrypticclient.terminal.commands.RegisterCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -71,6 +72,7 @@ public class Terminal {
         commands = new HashMap<>();
         commands.put("help", new HelpCommand());
         commands.put("login", new LoginCommand());
+        commands.put("register", new RegisterCommand());
     }
 
     private String getStartPrefix() {
@@ -82,6 +84,11 @@ public class Terminal {
         catch (UnknownHostException ignored) {}
 
         return username + "@" + hostname + " $ ";
+    }
+
+    public void loggedIn(String username) {
+        String hostname = "";
+        prefix = username + "@" + hostname + " $ ";
     }
 
     public HashMap<String, Command> getCommands() {

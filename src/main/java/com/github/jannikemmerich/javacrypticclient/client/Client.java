@@ -43,18 +43,33 @@ public class Client {
     }
 
     public boolean register(String username, String password, String mail) {
-        if(!connected) {
-            return false;
-        }
-
         if(loggedIn) {
             return true;
         }
 
-        new Request(JSONBuilder.newJSONObject().add("action", "register").add("username", username).add("password", password).add("mail", mail).build()).subscribe((data -> {
-            if(data.containsKey("token")) {
+        if(!connected) {
+            webSocketClient = new WebSocketClient(url);
+        }
+
+        new Request(JSONBuilder.newJSONObject().add("action", "register").add("name", username).add("password", password).add("mail", mail).build()).subscribe((data -> {
+            if (data.containsKey("token")) {
                 session = UUID.fromString((String) data.get("token"));
                 loggedIn = true;
+            } else if (data.containsKey("error")) {
+                loggedIn = false;
+                switch ((String) (data.get("error"))) {
+                    case "invalid password":
+                        System.out.println("Your password is not valid");
+                        break;
+                    case "invalid email":
+                        System.out.println("Your mail is not valid");
+                        break;
+                    case "username already exists":
+                        System.out.println("Your username already exists");
+                        break;
+                    default:
+                        System.out.println("Error while registering");
+                }
             }
         }));
 

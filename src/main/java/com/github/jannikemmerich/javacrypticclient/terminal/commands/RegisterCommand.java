@@ -2,7 +2,6 @@ package com.github.jannikemmerich.javacrypticclient.terminal.commands;
 
 import club.minnced.discord.rpc.DiscordRPC;
 import club.minnced.discord.rpc.DiscordRichPresence;
-import com.github.jannikemmerich.javacrypticclient.client.Request;
 import com.github.jannikemmerich.javacrypticclient.terminal.Terminal;
 
 import java.io.BufferedReader;
@@ -10,27 +9,35 @@ import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class LoginCommand implements Command {
+public class RegisterCommand implements Command {
 
     @Override
     public void execute(String[] args) {
         if (Terminal.getInstance().getClient().isLoggedIn()) {
-            System.out.println("You can not log in right now!");
+            System.out.println("You can not register right now!");
             return;
         }
 
-        if (args.length != 1) {
-            System.out.println("Usage: login <username>");
+        if (args.length != 0) {
+            System.out.println("Usage: register");
             return;
         }
+
+        String username = getString("Please enter your username: ");
+        String mail = getString("Please enter you mail address: ");
         String password = getPassword("Please enter your password: ");
-        if (Terminal.getInstance().getClient().login(args[0], password)) {
-            System.out.println("Successfully logged in");
-            Terminal.getInstance().loggedIn(args[0]);
+        if(!password.equals(getPassword("Please enter your password again: "))) {
+            System.out.println("The second password does not match the first password");
+            return;
+        }
+
+        if (Terminal.getInstance().getClient().register(username, password, mail)) {
+            System.out.println("Successfully registered and logged in");
+            Terminal.getInstance().loggedIn(username);
 
             DiscordRichPresence presence = new DiscordRichPresence();
             presence.startTimestamp = System.currentTimeMillis() / 1000;
-            presence.state = "Logged In: " + args[0];
+            presence.state = "Logged In: " + username;
             presence.details = "JavaCrypticClient";
             presence.largeImageKey = "cryptic";
             presence.largeImageText = "Cryptic";
@@ -48,14 +55,27 @@ public class LoginCommand implements Command {
                 }
             }).start();
 
-        } else {
-            System.out.println("Error while logging in");
         }
     }
 
     @Override
     public String getHelp() {
-        return "\t\tSend login request to the server";
+        return "\tRegister a new account";
+    }
+
+    private static String getString(String prompt) {
+        String password = "";
+        System.out.print(prompt);
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            password = in.readLine();
+        }
+        catch (IOException e){
+            System.out.println("Error trying to read your password!");
+            System.exit(1);
+        }
+
+        return password;
     }
 
     private static String getPassword(String prompt) {
