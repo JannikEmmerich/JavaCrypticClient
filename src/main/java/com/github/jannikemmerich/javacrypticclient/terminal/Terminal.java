@@ -71,6 +71,7 @@ public class Terminal {
         commands.put("login", new LoginCommand());
         commands.put("register", new RegisterCommand());
         commands.put("logout", new LogoutCommand());
+        commands.put("exit", new ExitCommand());
     }
 
     public void startPrefix() {
