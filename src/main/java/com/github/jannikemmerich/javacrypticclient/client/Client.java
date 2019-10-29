@@ -76,6 +76,11 @@ public class Client {
         return loggedIn;
     }
 
+    public void delete() {
+        new Request(JSONBuilder.newJSONObject().add("action", "delete").build()).subscribe(data -> {});
+        loggedIn = false;
+    }
+
     public void logout() {
         new Request(JSONBuilder.newJSONObject().add("action", "logout").build()).subscribe(data -> {});
         loggedIn = false;

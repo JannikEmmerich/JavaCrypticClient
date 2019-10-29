@@ -72,6 +72,7 @@ public class Terminal {
         commands.put("register", new RegisterCommand());
         commands.put("logout", new LogoutCommand());
         commands.put("exit", new ExitCommand());
+        commands.put("delete", new DeleteCommand());
     }
 
     public void startPrefix() {
