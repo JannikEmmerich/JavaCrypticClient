@@ -2,6 +2,7 @@ package com.github.jannikemmerich.javacrypticclient.terminal;
 
 import com.github.jannikemmerich.javacrypticclient.client.Client;
 import com.github.jannikemmerich.javacrypticclient.terminal.commands.*;
+import com.github.jannikemmerich.javacrypticclient.util.Device;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +10,8 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 public class Terminal {
 
@@ -17,6 +20,9 @@ public class Terminal {
     private Client client;
     private String prefix;
     private HashMap<String, Command> commands;
+
+    private UUID user;
+    private Device activeDevice;
 
     public Terminal(String url) {
         instance = this;
@@ -87,8 +93,18 @@ public class Terminal {
     }
 
     public void loggedIn(String username) {
-        String hostname = "";
-        prefix = username + "@" + hostname + " $ ";
+        client.info().subscribe((result) -> {
+            user = UUID.fromString((String) result.get("uuid"));
+        });
+
+        List<Device> devices = Device.getDevices();
+        if(devices.size() == 0) {
+            devices.add(Device.getStarterDevice());
+        }
+
+        activeDevice = devices.get(0);
+
+        prefix = username + "@" + activeDevice.getName() + " $ ";
     }
 
     public HashMap<String, Command> getCommands() {

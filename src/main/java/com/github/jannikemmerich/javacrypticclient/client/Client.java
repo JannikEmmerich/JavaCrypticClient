@@ -39,7 +39,7 @@ public class Client {
     }
 
     public Request info() {
-        return new Request(JSONBuilder.newJSONObject().add("action", "status").build());
+        return new Request(JSONBuilder.newJSONObject().add("action", "info").build());
     }
 
     public boolean register(String username, String password, String mail) {
